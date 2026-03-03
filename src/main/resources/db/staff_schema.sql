@@ -1,0 +1,16 @@
+CREATE TABLE IF NOT EXISTS staff (
+  id INT AUTO_INCREMENT PRIMARY KEY,
+  name VARCHAR(120) NOT NULL,
+  email VARCHAR(160) NOT NULL,
+  gender VARCHAR(20),
+  nic VARCHAR(20),
+  employee_id VARCHAR(50) NOT NULL,
+  role VARCHAR(60) NOT NULL,
+  hours_start TIME NOT NULL,
+  hours_end TIME NOT NULL,
+  status VARCHAR(20) NOT NULL,
+  created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+  updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
+  UNIQUE KEY uk_staff_email (email),
+  UNIQUE KEY uk_staff_employee (employee_id)
+);

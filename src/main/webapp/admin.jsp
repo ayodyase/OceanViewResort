@@ -66,6 +66,11 @@
       gap: 18px;
       margin-top: 24px;
     }
+    .subtext {
+      margin: 6px 0 0;
+      color: var(--muted);
+      font-size: 14px;
+    }
     .card {
       background: var(--card);
       border-radius: var(--radius);
@@ -100,6 +105,11 @@
       border-radius: 999px;
       margin-top: 12px;
     }
+    .card-link {
+      text-decoration: none;
+      color: inherit;
+      display: block;
+    }
   </style>
 </head>
 <body>
@@ -118,36 +128,36 @@
     <p class="subtext">Select a module to manage resort operations.</p>
 
     <div class="grid">
-      <div class="card">
+      <a class="card card-link" href="${pageContext.request.contextPath}/users">
         <h2>Users</h2>
         <p>Manage staff accounts, access levels, and activation status.</p>
         <span class="pill">Admin only</span>
-      </div>
-      <div class="card">
+      </a>
+      <a class="card card-link" href="${pageContext.request.contextPath}/rooms">
         <h2>Rooms</h2>
         <p>Configure room inventory, rates, and availability.</p>
         <span class="pill">Operations</span>
-      </div>
-      <div class="card">
+      </a>
+      <a class="card card-link" href="${pageContext.request.contextPath}/bookings">
         <h2>Bookings</h2>
         <p>Review upcoming stays, check-ins, and cancellations.</p>
         <span class="pill">Front desk</span>
-      </div>
-      <div class="card">
+      </a>
+      <a class="card card-link" href="${pageContext.request.contextPath}/payments">
         <h2>Payments</h2>
         <p>Track invoices, deposits, and settlement status.</p>
         <span class="pill">Finance</span>
-      </div>
-      <div class="card">
+      </a>
+      <a class="card card-link" href="${pageContext.request.contextPath}/reports">
         <h2>Reports</h2>
         <p>Generate occupancy, revenue, and performance reports.</p>
         <span class="pill">Analytics</span>
-      </div>
-      <div class="card">
+      </a>
+      <a class="card card-link" href="${pageContext.request.contextPath}/settings">
         <h2>Settings</h2>
         <p>Resort details, policies, and system preferences.</p>
         <span class="pill">Configuration</span>
-      </div>
+      </a>
     </div>
   </main>
 </body>
