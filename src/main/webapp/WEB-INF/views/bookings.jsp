@@ -6,6 +6,7 @@
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1" />
   <title>Ocean View Resort - Bookings</title>
+  <link rel="icon" href="${pageContext.request.contextPath}/assets/logo.png" />
   <style>
     :root {
       --bg: #f4f6fb;
@@ -200,7 +201,6 @@
         <img class="brand-logo" src="${pageContext.request.contextPath}/assets/logo.png" alt="Ocean View Resort logo" />
         <div>
           <h1>Ocean View Resort</h1>
-          <span>Administration Panel - Bookings</span>
         </div>
       </div>
       <div class="header-actions">
@@ -212,8 +212,7 @@
   </header>
 
   <main>
-    <h2>Bookings</h2>
-    <p class="subtext">Review upcoming stays, check-ins, and cancellations.</p>
+    <h2>Add New Reservation</h2>
 
     <section class="section">
       <c:if test="${not empty errorMessage}">
@@ -243,8 +242,6 @@
                 <label for="status">Status</label>
                 <select class="select" id="status" name="status">
                   <option value="Confirmed" <c:if test="${bookingForm.status == 'Confirmed'}">selected</c:if>>Confirmed</option>
-                  <option value="Checked In" <c:if test="${bookingForm.status == 'Checked In'}">selected</c:if>>Checked In</option>
-                  <option value="Checked Out" <c:if test="${bookingForm.status == 'Checked Out'}">selected</c:if>>Checked Out</option>
                   <option value="Cancelled" <c:if test="${bookingForm.status == 'Cancelled'}">selected</c:if>>Cancelled</option>
                 </select>
               </div>
@@ -269,7 +266,7 @@
         </div>
 
         <div class="panel">
-          <h4>Booking List</h4>
+          <h4>Reservation List</h4>
           <table class="table">
             <thead>
               <tr>

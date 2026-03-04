@@ -11,6 +11,11 @@ import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import javax.servlet.http.HttpSession;
 import java.io.IOException;
+import java.sql.Connection;
+import java.sql.DriverManager;
+import java.sql.PreparedStatement;
+import java.sql.ResultSet;
+import java.sql.SQLException;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -20,16 +25,13 @@ public class RoomsController {
     private final com.oceanviewresort.model.RoomDao roomDao;
     private final com.oceanviewresort.model.RoomRateDao roomRateDao;
     private final com.oceanviewresort.model.RoomAvailabilityDao roomAvailabilityDao;
-    private final com.oceanviewresort.model.HousekeepingStatusDao housekeepingStatusDao;
 
     public RoomsController(com.oceanviewresort.model.RoomDao roomDao,
                            com.oceanviewresort.model.RoomRateDao roomRateDao,
-                           com.oceanviewresort.model.RoomAvailabilityDao roomAvailabilityDao,
-                           com.oceanviewresort.model.HousekeepingStatusDao housekeepingStatusDao) {
+                           com.oceanviewresort.model.RoomAvailabilityDao roomAvailabilityDao) {
         this.roomDao = roomDao;
         this.roomRateDao = roomRateDao;
         this.roomAvailabilityDao = roomAvailabilityDao;
-        this.housekeepingStatusDao = housekeepingStatusDao;
     }
 
     @GetMapping({"", "/"})
@@ -135,6 +137,15 @@ public class RoomsController {
                 model.addAttribute("errorMessage", "Selected availability record was not found.");
             }
         }
+        String dbUrl = getConfigValue(request, "DB_URL");
+        String dbUser = getConfigValue(request, "DB_USER");
+        String dbPassword = getConfigValue(request, "DB_PASSWORD");
+
+        model.addAttribute("availableRoomsCount", fetchCount(dbUrl, dbUser, dbPassword,
+                "SELECT COUNT(*) FROM rooms WHERE status = 'Available'"));
+        model.addAttribute("bookedRoomsCount", fetchCount(dbUrl, dbUser, dbPassword,
+                "SELECT COUNT(*) FROM bookings WHERE status = 'Confirmed'"));
+
         model.addAttribute("availabilityForm", form);
         model.addAttribute("availabilityList", roomAvailabilityDao.findAll());
         return "room-availability";
@@ -172,62 +183,6 @@ public class RoomsController {
         }
         roomAvailabilityDao.delete(id);
         return "redirect:/rooms/availability";
-    }
-
-    @GetMapping("/housekeeping")
-    public String housekeepingPage(@RequestParam(value = "editId", required = false) Integer editId,
-                                   Model model,
-                                   HttpServletRequest request,
-                                   HttpServletResponse response) throws IOException {
-        if (!ensureAdmin(request, response)) {
-            return null;
-        }
-        com.oceanviewresort.model.HousekeepingStatus form = new com.oceanviewresort.model.HousekeepingStatus();
-        if (editId != null) {
-            com.oceanviewresort.model.HousekeepingStatus existing = housekeepingStatusDao.findById(editId);
-            if (existing != null) {
-                form = existing;
-            } else {
-                model.addAttribute("errorMessage", "Selected housekeeping record was not found.");
-            }
-        }
-        model.addAttribute("housekeepingForm", form);
-        model.addAttribute("housekeepingList", housekeepingStatusDao.findAll());
-        return "housekeeping-status";
-    }
-
-    @PostMapping("/housekeeping/save")
-    public String saveHousekeeping(com.oceanviewresort.model.HousekeepingStatus status,
-                                   Model model,
-                                   HttpServletRequest request,
-                                   HttpServletResponse response) throws IOException {
-        if (!ensureAdmin(request, response)) {
-            return null;
-        }
-        List<String> errors = validateHousekeeping(status);
-        if (!errors.isEmpty()) {
-            model.addAttribute("housekeepingForm", status);
-            model.addAttribute("housekeepingList", housekeepingStatusDao.findAll());
-            model.addAttribute("errorMessage", String.join(" ", errors));
-            return "housekeeping-status";
-        }
-        if (status.getId() == null) {
-            housekeepingStatusDao.create(status);
-        } else {
-            housekeepingStatusDao.update(status);
-        }
-        return "redirect:/rooms/housekeeping";
-    }
-
-    @PostMapping("/housekeeping/delete")
-    public String deleteHousekeeping(@RequestParam("id") int id,
-                                     HttpServletRequest request,
-                                     HttpServletResponse response) throws IOException {
-        if (!ensureAdmin(request, response)) {
-            return null;
-        }
-        housekeepingStatusDao.delete(id);
-        return "redirect:/rooms/housekeeping";
     }
 
     @PostMapping("/inventory/save")
@@ -319,27 +274,7 @@ public class RoomsController {
         if (isBlank(availability.getRoomNumber())) {
             errors.add("Room number is required.");
         }
-        if (isBlank(availability.getDate())) {
-            errors.add("Date is required.");
-        }
         if (isBlank(availability.getAvailabilityStatus())) {
-            errors.add("Availability status is required.");
-        }
-        return errors;
-    }
-
-    private List<String> validateHousekeeping(com.oceanviewresort.model.HousekeepingStatus status) {
-        List<String> errors = new ArrayList<>();
-        if (isBlank(status.getHousekeeperName())) {
-            errors.add("Housekeeper name is required.");
-        }
-        if (status.getCustomerRating() == null || status.getCustomerRating() < 1 || status.getCustomerRating() > 5) {
-            errors.add("Customer rating must be between 1 and 5.");
-        }
-        if (isBlank(status.getHoursStart()) || isBlank(status.getHoursEnd())) {
-            errors.add("Working hours start and end are required.");
-        }
-        if (isBlank(status.getAvailabilityStatus())) {
             errors.add("Availability status is required.");
         }
         return errors;
@@ -347,5 +282,30 @@ public class RoomsController {
 
     private boolean isBlank(String value) {
         return value == null || value.trim().isEmpty();
+    }
+
+    private String getConfigValue(HttpServletRequest request, String key) {
+        String envValue = System.getenv(key);
+        if (envValue != null && !envValue.trim().isEmpty()) {
+            return envValue.trim();
+        }
+        String ctxValue = request.getServletContext().getInitParameter(key);
+        return ctxValue == null ? "" : ctxValue.trim();
+    }
+
+    private int fetchCount(String dbUrl, String dbUser, String dbPassword, String sql) {
+        if (dbUrl == null || dbUrl.trim().isEmpty()) {
+            return 0;
+        }
+        try (Connection connection = DriverManager.getConnection(dbUrl, dbUser, dbPassword);
+             PreparedStatement statement = connection.prepareStatement(sql);
+             ResultSet resultSet = statement.executeQuery()) {
+            if (resultSet.next()) {
+                return resultSet.getInt(1);
+            }
+        } catch (SQLException ex) {
+            return 0;
+        }
+        return 0;
     }
 }

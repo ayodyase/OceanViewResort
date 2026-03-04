@@ -3,7 +3,6 @@ package com.oceanviewresort.model;
 public class RoomAvailability {
     private Integer id;
     private String roomNumber;
-    private String date;
     private String availabilityStatus;
     private String notes;
 
@@ -21,14 +20,6 @@ public class RoomAvailability {
 
     public void setRoomNumber(String roomNumber) {
         this.roomNumber = roomNumber;
-    }
-
-    public String getDate() {
-        return date;
-    }
-
-    public void setDate(String date) {
-        this.date = date;
     }
 
     public String getAvailabilityStatus() {

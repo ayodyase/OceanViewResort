@@ -6,6 +6,7 @@
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1" />
   <title>Ocean View Resort - Room Availability</title>
+  <link rel="icon" href="${pageContext.request.contextPath}/assets/logo.png" />
   <style>
     :root {
       --bg: #f4f6fb;
@@ -96,11 +97,6 @@
       max-width: 1200px;
       margin: 0 auto;
     }
-    .subtext {
-      margin: 6px 0 0;
-      color: var(--muted);
-      font-size: 14px;
-    }
     .section {
       margin-top: 24px;
       background: #ffffffcc;
@@ -108,6 +104,29 @@
       border-radius: 24px;
       padding: 24px;
       box-shadow: 0 20px 50px rgba(15, 23, 42, 0.08);
+    }
+    .stats {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
+      gap: 16px;
+      margin-top: 12px;
+    }
+    .stat-card {
+      background: var(--card);
+      border-radius: 16px;
+      padding: 14px 16px;
+      border: 1px solid #eef0f5;
+      text-align: center;
+    }
+    .stat-card h3 {
+      margin: 0;
+      font-size: 20px;
+    }
+    .stat-card span {
+      display: block;
+      color: var(--muted);
+      font-size: 12px;
+      margin-top: 6px;
     }
     .section-grid {
       display: grid;
@@ -205,7 +224,6 @@
         <img class="brand-logo" src="${pageContext.request.contextPath}/assets/logo.png" alt="Ocean View Resort logo" />
         <div>
           <h1>Ocean View Resort</h1>
-          <span>Administration Panel - Room Availability</span>
         </div>
       </div>
       <div class="header-actions">
@@ -218,7 +236,16 @@
 
   <main>
     <h2>Room Availability</h2>
-    <p class="subtext">Manage room availability by date and status.</p>
+    <div class="stats">
+      <div class="stat-card">
+        <h3>${availableRoomsCount}</h3>
+        <span>Available Rooms</span>
+      </div>
+      <div class="stat-card">
+        <h3>${bookedRoomsCount}</h3>
+        <span>Booked Rooms</span>
+      </div>
+    </div>
 
     <section class="section">
       <c:if test="${not empty errorMessage}">
@@ -234,17 +261,13 @@
                 <label for="room-number">Room number</label>
                 <input class="input" id="room-number" name="roomNumber" type="text" required value="<c:out value='${availabilityForm.roomNumber}'/>" />
               </div>
-              <div class="field">
-                <label for="availability-date">Date</label>
-                <input class="input" id="availability-date" name="date" type="date" required value="<c:out value='${availabilityForm.date}'/>" />
-              </div>
             </div>
             <div class="form-row">
               <div class="field">
                 <label for="availability-status">Status</label>
                 <select class="select" id="availability-status" name="availabilityStatus">
                   <option value="Available" <c:if test="${availabilityForm.availabilityStatus == 'Available'}">selected</c:if>>Available</option>
-                  <option value="Blocked" <c:if test="${availabilityForm.availabilityStatus == 'Blocked'}">selected</c:if>>Blocked</option>
+                  <option value="Booked" <c:if test="${availabilityForm.availabilityStatus == 'Booked'}">selected</c:if>>Booked</option>
                   <option value="Maintenance" <c:if test="${availabilityForm.availabilityStatus == 'Maintenance'}">selected</c:if>>Maintenance</option>
                 </select>
               </div>
@@ -268,7 +291,6 @@
             <thead>
               <tr>
                 <th>Room</th>
-                <th>Date</th>
                 <th>Status</th>
                 <th>Notes</th>
                 <th>Actions</th>
@@ -278,7 +300,6 @@
               <c:forEach var="availability" items="${availabilityList}">
                 <tr>
                   <td><c:out value="${availability.roomNumber}" /></td>
-                  <td><c:out value="${availability.date}" /></td>
                   <td><c:out value="${availability.availabilityStatus}" /></td>
                   <td><c:out value="${availability.notes}" /></td>
                   <td>

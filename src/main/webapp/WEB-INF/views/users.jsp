@@ -6,6 +6,7 @@
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1" />
   <title>Ocean View Resort - Users Management</title>
+  <link rel="icon" href="${pageContext.request.contextPath}/assets/logo.png" />
   <style>
     :root {
       --bg: #f4f6fb;
@@ -265,7 +266,6 @@
         <img class="brand-logo" src="${pageContext.request.contextPath}/assets/logo.png" alt="Ocean View Resort logo" />
         <div>
           <h1>Ocean View Resort</h1>
-          <span>Administration Panel - Users Management</span>
         </div>
       </div>
       <div class="header-actions">
@@ -280,16 +280,14 @@
   </header>
 
   <main>
-    <h2>Users Management</h2>
-    <p class="subtext">Manage staff, assign roles, track working hours, and control activation status.</p>
+    <h2>Staff Management</h2>
 
     <section class="section" aria-labelledby="users-section-title">
-      <div class="section-header">
-        <div>
-          <h3 id="users-section-title">Staff Profiles</h3>
-          <span>Use the form to add or edit staff, and manage status.</span>
-        </div>
-        <div class="actions">
+        <div class="section-header">
+          <div>
+            <h3 id="users-section-title">Staff Profiles</h3>
+          </div>
+          <div class="actions">
           <a class="btn-link" href="${pageContext.request.contextPath}/users">
             <button class="btn btn-secondary" type="button">Manage Staff</button>
           </a>
@@ -339,8 +337,8 @@
                 <select class="select" id="staff-role" name="role">
                   <option value="Front Desk" <c:if test="${staffForm.role == 'Front Desk'}">selected</c:if>>Front Desk</option>
                   <option value="Housekeeping" <c:if test="${staffForm.role == 'Housekeeping'}">selected</c:if>>Housekeeping</option>
-                  <option value="Concierge" <c:if test="${staffForm.role == 'Concierge'}">selected</c:if>>Concierge</option>
                   <option value="Maintenance" <c:if test="${staffForm.role == 'Maintenance'}">selected</c:if>>Maintenance</option>
+                  <option value="IT Executive" <c:if test="${staffForm.role == 'IT Executive'}">selected</c:if>>IT Executive</option>
                   <option value="Manager" <c:if test="${staffForm.role == 'Manager'}">selected</c:if>>Manager</option>
                 </select>
               </div>

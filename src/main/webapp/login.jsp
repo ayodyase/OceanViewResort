@@ -1,10 +1,11 @@
-﻿<%@ page contentType="text/html; charset=UTF-8" language="java" %>
+<%@ page contentType="text/html; charset=UTF-8" language="java" %>
 <!DOCTYPE html>
 <html lang="en">
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1" />
   <title>Ocean View Resort - Login</title>
+  <link rel="icon" href="${pageContext.request.contextPath}/assets/logo.png" />
   <style>
     :root {
       --bg: #f4f6fb;
@@ -138,7 +139,6 @@
       <img class="brand-logo" src="${pageContext.request.contextPath}/assets/logo.png" alt="Ocean View Resort logo" />
       <div>
         <h1>Ocean View Resort</h1>
-        <p class="subtext">Staff &amp; management access</p>
       </div>
     </div>
 

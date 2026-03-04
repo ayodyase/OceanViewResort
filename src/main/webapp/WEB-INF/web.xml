@@ -43,6 +43,14 @@
     <servlet-name>AdminServlet</servlet-name>
     <url-pattern>/admin</url-pattern>
   </servlet-mapping>
+  <servlet>
+    <servlet-name>LogoutServlet</servlet-name>
+    <servlet-class>com.oceanviewresort.controller.LogoutServlet</servlet-class>
+  </servlet>
+  <servlet-mapping>
+    <servlet-name>LogoutServlet</servlet-name>
+    <url-pattern>/logout</url-pattern>
+  </servlet-mapping>
 
   <servlet>
     <servlet-name>UsersDispatcher</servlet-name>

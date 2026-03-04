@@ -6,6 +6,7 @@
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1" />
   <title>Ocean View Resort - Rates & Packages</title>
+  <link rel="icon" href="${pageContext.request.contextPath}/assets/logo.png" />
   <style>
     :root {
       --bg: #f4f6fb;
@@ -95,11 +96,6 @@
       padding: 32px 36px 48px;
       max-width: 1200px;
       margin: 0 auto;
-    }
-    .subtext {
-      margin: 6px 0 0;
-      color: var(--muted);
-      font-size: 14px;
     }
     .section {
       margin-top: 24px;
@@ -200,7 +196,6 @@
         <img class="brand-logo" src="${pageContext.request.contextPath}/assets/logo.png" alt="Ocean View Resort logo" />
         <div>
           <h1>Ocean View Resort</h1>
-          <span>Administration Panel - Rates & Packages</span>
         </div>
       </div>
       <div class="header-actions">
@@ -213,7 +208,6 @@
 
   <main>
     <h2>Rates & Packages</h2>
-    <p class="subtext">Set pricing by room type, season, and package.</p>
 
     <section class="section">
       <c:if test="${not empty errorMessage}">

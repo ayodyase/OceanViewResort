@@ -6,6 +6,7 @@
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1" />
   <title>Ocean View Resort - Payments</title>
+  <link rel="icon" href="${pageContext.request.contextPath}/assets/logo.png" />
   <style>
     :root {
       --bg: #f4f6fb;
@@ -90,6 +91,21 @@
     .btn-danger {
       background: #f05353;
       box-shadow: 0 10px 20px rgba(240, 83, 83, 0.2);
+    }
+    @media print {
+      header,
+      .panel form,
+      .inline-actions,
+      .header-actions {
+        display: none !important;
+      }
+      body {
+        background: #fff;
+      }
+      .section {
+        box-shadow: none;
+        border: none;
+      }
     }
     main {
       padding: 32px 36px 48px;
@@ -200,7 +216,6 @@
         <img class="brand-logo" src="${pageContext.request.contextPath}/assets/logo.png" alt="Ocean View Resort logo" />
         <div>
           <h1>Ocean View Resort</h1>
-          <span>Administration Panel - Payments</span>
         </div>
       </div>
       <div class="header-actions">
@@ -212,8 +227,7 @@
   </header>
 
   <main>
-    <h2>Payments</h2>
-    <p class="subtext">Track invoices, deposits, and settlement status.</p>
+    <h2>Billing &amp; Payments</h2>
 
     <section class="section">
       <c:if test="${not empty errorMessage}">
@@ -226,7 +240,7 @@
             <input type="hidden" name="id" value="<c:out value='${paymentForm.id}'/>" />
             <div class="form-row">
               <div class="field">
-                <label for="booking-reference">Booking reference</label>
+                <label for="booking-reference">Billing Reference</label>
                 <input class="input" id="booking-reference" name="bookingReference" type="text" required value="<c:out value='${paymentForm.bookingReference}'/>" />
               </div>
               <div class="field">
@@ -286,7 +300,7 @@
             </thead>
             <tbody>
               <c:forEach var="payment" items="${paymentList}">
-                <tr>
+                <tr data-date="<c:out value='${payment.paymentDate}'/>">
                   <td><c:out value="${payment.bookingReference}" /></td>
                   <td><c:out value="${payment.guestName}" /></td>
                   <td><c:out value="${payment.amount}" /></td>
@@ -302,6 +316,9 @@
                         <input type="hidden" name="id" value="<c:out value='${payment.id}'/>" />
                         <button class="btn btn-danger" type="submit">Delete</button>
                       </form>
+                      <button class="btn" type="button" onclick="printPayment(this)">
+                        Print
+                      </button>
                     </div>
                   </td>
                 </tr>
@@ -317,5 +334,50 @@
       </div>
     </section>
   </main>
+  <script>
+    function printPayment(button) {
+      const row = button.closest("tr");
+      const cells = row ? row.querySelectorAll("td") : [];
+      const reference = cells[0]?.textContent?.trim() || "";
+      const guest = cells[1]?.textContent?.trim() || "";
+      const amount = cells[2]?.textContent?.trim() || "";
+      const method = cells[3]?.textContent?.trim() || "";
+      const status = cells[4]?.textContent?.trim() || "";
+      const date = row?.dataset.date || "";
+      const win = window.open("", "_blank", "width=720,height=640");
+      if (!win) return;
+      const html =
+        "<!DOCTYPE html>" +
+        "<html lang='en'>" +
+        "<head>" +
+        "<meta charset='UTF-8' />" +
+        "<title>Payment Receipt</title>" +
+  <link rel="icon" href="${pageContext.request.contextPath}/assets/logo.png" />
+        "<style>" +
+        "body { font-family: \"Segoe UI\", Arial, sans-serif; padding: 24px; color: #1f2937; }" +
+        "h1 { font-size: 20px; margin: 0 0 12px; }" +
+        "table { width: 100%; border-collapse: collapse; margin-top: 12px; }" +
+        "td { padding: 8px 6px; border-bottom: 1px solid #e5e7eb; }" +
+        ".label { color: #6b7280; width: 160px; }" +
+        "</style>" +
+        "</head>" +
+        "<body>" +
+        "<h1>Ocean View Resort - Payment Receipt</h1>" +
+        "<table>" +
+        "<tr><td class='label'>Billing Reference</td><td>" + reference + "</td></tr>" +
+        "<tr><td class='label'>Guest Name</td><td>" + guest + "</td></tr>" +
+        "<tr><td class='label'>Amount</td><td>" + amount + "</td></tr>" +
+        "<tr><td class='label'>Method</td><td>" + method + "</td></tr>" +
+        "<tr><td class='label'>Payment Date</td><td>" + date + "</td></tr>" +
+        "<tr><td class='label'>Status</td><td>" + status + "</td></tr>" +
+        "</table>" +
+        "<script>window.onload = function() { window.print(); };<\/script>" +
+        "</body>" +
+        "</html>";
+      win.document.open();
+      win.document.write(html);
+      win.document.close();
+    }
+  </script>
 </body>
 </html>

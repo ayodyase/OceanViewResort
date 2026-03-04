@@ -6,6 +6,7 @@
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1" />
   <title>Ocean View Resort - Room Inventory</title>
+  <link rel="icon" href="${pageContext.request.contextPath}/assets/logo.png" />
   <style>
     :root {
       --bg: #f4f6fb;
@@ -91,11 +92,6 @@
       padding: 32px 36px 48px;
       max-width: 1200px;
       margin: 0 auto;
-    }
-    .subtext {
-      margin: 6px 0 0;
-      color: var(--muted);
-      font-size: 14px;
     }
     .section {
       margin-top: 24px;
@@ -196,7 +192,6 @@
         <img class="brand-logo" src="${pageContext.request.contextPath}/assets/logo.png" alt="Ocean View Resort logo" />
         <div>
           <h1>Ocean View Resort</h1>
-          <span>Administration Panel - Room Inventory</span>
         </div>
       </div>
       <div class="header-actions">
@@ -209,7 +204,6 @@
 
   <main>
     <h2>Room Inventory</h2>
-    <p class="subtext">Create room types, assign capacities, and track inventory status.</p>
 
     <section class="section">
       <c:if test="${not empty errorMessage}">
@@ -230,7 +224,6 @@
                 <select class="select" id="room-type" name="roomType">
                   <option value="Standard" <c:if test="${roomForm.roomType == 'Standard'}">selected</c:if>>Standard</option>
                   <option value="Deluxe" <c:if test="${roomForm.roomType == 'Deluxe'}">selected</c:if>>Deluxe</option>
-                  <option value="Suite" <c:if test="${roomForm.roomType == 'Suite'}">selected</c:if>>Suite</option>
                   <option value="Family" <c:if test="${roomForm.roomType == 'Family'}">selected</c:if>>Family</option>
                 </select>
               </div>
@@ -244,8 +237,7 @@
                 <label for="room-status">Status</label>
                 <select class="select" id="room-status" name="status">
                   <option value="Available" <c:if test="${roomForm.status == 'Available'}">selected</c:if>>Available</option>
-                  <option value="Occupied" <c:if test="${roomForm.status == 'Occupied'}">selected</c:if>>Occupied</option>
-                  <option value="Maintenance" <c:if test="${roomForm.status == 'Maintenance'}">selected</c:if>>Maintenance</option>
+                  <option value="Non-Available" <c:if test="${roomForm.status == 'Non-Available'}">selected</c:if>>Non-Available</option>
                 </select>
               </div>
             </div>

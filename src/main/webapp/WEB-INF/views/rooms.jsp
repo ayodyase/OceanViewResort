@@ -5,6 +5,7 @@
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1" />
   <title>Ocean View Resort - Rooms</title>
+  <link rel="icon" href="${pageContext.request.contextPath}/assets/logo.png" />
   <style>
     :root {
       --bg: #f4f6fb;
@@ -117,6 +118,7 @@
     .card h3 {
       margin: 0 0 8px 0;
       font-size: 16px;
+      text-align: center;
     }
     .card p {
       margin: 0;
@@ -133,7 +135,6 @@
         <img class="brand-logo" src="${pageContext.request.contextPath}/assets/logo.png" alt="Ocean View Resort logo" />
         <div>
           <h1>Ocean View Resort</h1>
-          <span>Administration Panel - Rooms</span>
         </div>
       </div>
       <div class="header-actions">
@@ -145,25 +146,16 @@
   </header>
 
   <main>
-    <h2>Rooms</h2>
-    <p class="subtext">Configure room inventory, pricing tiers, and availability.</p>
-
+    <h2>Room Management</h2>
     <div class="grid">
       <a class="card card-link" href="${pageContext.request.contextPath}/rooms/inventory">
         <h3>Room Inventory</h3>
-        <p>Add room types, floor plans, and capacity details.</p>
       </a>
       <a class="card card-link" href="${pageContext.request.contextPath}/rooms/rates">
         <h3>Rates & Packages</h3>
-        <p>Update nightly rates, seasonal pricing, and offers.</p>
       </a>
       <a class="card card-link" href="${pageContext.request.contextPath}/rooms/availability">
-        <h3>Availability</h3>
-        <p>Block rooms for maintenance and manage blackout dates.</p>
-      </a>
-      <a class="card card-link" href="${pageContext.request.contextPath}/rooms/housekeeping">
-        <h3>Housekeeping Status</h3>
-        <p>Track cleaning schedules and ready-to-sell rooms.</p>
+        <h3>Rooms Availability</h3>
       </a>
     </div>
   </main>
