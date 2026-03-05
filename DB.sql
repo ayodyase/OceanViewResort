@@ -22,6 +22,7 @@ CREATE TABLE IF NOT EXISTS staff (
   hours_start TIME NOT NULL,
   hours_end TIME NOT NULL,
   status VARCHAR(20) NOT NULL,
+  password_hash VARCHAR(255),
   created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
   updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
   UNIQUE KEY uk_staff_email (email),
@@ -84,3 +85,4 @@ CREATE TABLE IF NOT EXISTS payments (
 );
 
 ALTER TABLE room_availability DROP COLUMN availability_date;staff
+ALTER TABLE staff ADD COLUMN IF NOT EXISTS password_hash VARCHAR(255);

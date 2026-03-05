@@ -259,13 +259,13 @@
             <div class="form-row">
               <div class="field">
                 <label for="room-number">Room number</label>
-                <input class="input" id="room-number" name="roomNumber" type="text" required value="<c:out value='${availabilityForm.roomNumber}'/>" />
+                  <input class="input" id="room-number" name="roomNumber" type="text" required value="<c:out value='${availabilityForm.roomNumber}'/>" <c:if test="${!canEdit}">disabled</c:if> />
               </div>
             </div>
             <div class="form-row">
               <div class="field">
                 <label for="availability-status">Status</label>
-                <select class="select" id="availability-status" name="availabilityStatus">
+                  <select class="select" id="availability-status" name="availabilityStatus" <c:if test="${!canEdit}">disabled</c:if>>
                   <option value="Available" <c:if test="${availabilityForm.availabilityStatus == 'Available'}">selected</c:if>>Available</option>
                   <option value="Booked" <c:if test="${availabilityForm.availabilityStatus == 'Booked'}">selected</c:if>>Booked</option>
                   <option value="Maintenance" <c:if test="${availabilityForm.availabilityStatus == 'Maintenance'}">selected</c:if>>Maintenance</option>
@@ -274,14 +274,16 @@
             </div>
             <div class="field">
               <label for="notes">Notes</label>
-              <textarea id="notes" name="notes"><c:out value="${availabilityForm.notes}" /></textarea>
+              <textarea id="notes" name="notes" <c:if test="${!canEdit}">disabled</c:if>><c:out value="${availabilityForm.notes}" /></textarea>
             </div>
-            <div class="header-actions">
-              <button class="btn" type="submit">Save Availability</button>
-              <a class="btn-link" href="${pageContext.request.contextPath}/rooms/availability">
-                <button class="btn btn-secondary" type="button">Clear Form</button>
-              </a>
-            </div>
+            <c:if test="${canEdit}">
+              <div class="header-actions">
+                <button class="btn" type="submit">Save Availability</button>
+                <a class="btn-link" href="${pageContext.request.contextPath}/rooms/availability">
+                  <button class="btn btn-secondary" type="button">Clear Form</button>
+                </a>
+              </div>
+            </c:if>
           </form>
         </div>
 
@@ -293,7 +295,9 @@
                 <th>Room</th>
                 <th>Status</th>
                 <th>Notes</th>
-                <th>Actions</th>
+                  <c:if test="${canEdit}">
+                    <th>Actions</th>
+                  </c:if>
               </tr>
             </thead>
             <tbody>
@@ -302,24 +306,33 @@
                   <td><c:out value="${availability.roomNumber}" /></td>
                   <td><c:out value="${availability.availabilityStatus}" /></td>
                   <td><c:out value="${availability.notes}" /></td>
-                  <td>
-                    <div class="inline-actions">
-                      <form class="inline-form" method="get" action="${pageContext.request.contextPath}/rooms/availability">
-                        <input type="hidden" name="editId" value="<c:out value='${availability.id}'/>" />
-                        <button class="btn btn-secondary" type="submit">Edit</button>
-                      </form>
-                      <form class="inline-form" method="post" action="${pageContext.request.contextPath}/rooms/availability/delete">
-                        <input type="hidden" name="id" value="<c:out value='${availability.id}'/>" />
-                        <button class="btn btn-danger" type="submit">Delete</button>
-                      </form>
-                    </div>
-                  </td>
+                    <c:if test="${canEdit}">
+                      <td>
+                        <div class="inline-actions">
+                          <form class="inline-form" method="get" action="${pageContext.request.contextPath}/rooms/availability">
+                            <input type="hidden" name="editId" value="<c:out value='${availability.id}'/>" />
+                            <button class="btn btn-secondary" type="submit">Edit</button>
+                          </form>
+                          <form class="inline-form" method="post" action="${pageContext.request.contextPath}/rooms/availability/delete">
+                            <input type="hidden" name="id" value="<c:out value='${availability.id}'/>" />
+                            <button class="btn btn-danger" type="submit">Delete</button>
+                          </form>
+                        </div>
+                      </td>
+                    </c:if>
                 </tr>
               </c:forEach>
               <c:if test="${empty availabilityList}">
-                <tr>
-                  <td colspan="5">No availability records yet.</td>
-                </tr>
+                  <tr>
+                    <c:choose>
+                      <c:when test="${canEdit}">
+                        <td colspan="4">No availability records yet.</td>
+                      </c:when>
+                      <c:otherwise>
+                        <td colspan="3">No availability records yet.</td>
+                      </c:otherwise>
+                    </c:choose>
+                  </tr>
               </c:if>
             </tbody>
           </table>

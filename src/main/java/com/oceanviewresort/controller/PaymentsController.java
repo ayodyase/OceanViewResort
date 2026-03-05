@@ -15,6 +15,7 @@ import javax.servlet.http.HttpSession;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
+import com.oceanviewresort.security.AccessUtil;
 
 @Controller
 @RequestMapping("/payments")
@@ -30,9 +31,13 @@ public class PaymentsController {
                                Model model,
                                HttpServletRequest request,
                                HttpServletResponse response) throws IOException {
-        if (!ensureAdmin(request, response)) {
+        if (!AccessUtil.ensureLoggedIn(request, response)) {
             return null;
         }
+
+        HttpSession session = request.getSession(false);
+        model.addAttribute("canEdit", AccessUtil.canEdit(session));
+        model.addAttribute("canPrint", true);
 
         Payment form = new Payment();
         if (editId != null) {
@@ -54,7 +59,7 @@ public class PaymentsController {
                               Model model,
                               HttpServletRequest request,
                               HttpServletResponse response) throws IOException {
-        if (!ensureAdmin(request, response)) {
+        if (!AccessUtil.ensureCanEdit(request, response)) {
             return null;
         }
 
@@ -78,25 +83,11 @@ public class PaymentsController {
     public String deletePayment(@RequestParam("id") int id,
                                 HttpServletRequest request,
                                 HttpServletResponse response) throws IOException {
-        if (!ensureAdmin(request, response)) {
+        if (!AccessUtil.ensureCanEdit(request, response)) {
             return null;
         }
         paymentDao.delete(id);
         return "redirect:/payments";
-    }
-
-    private boolean ensureAdmin(HttpServletRequest request, HttpServletResponse response) throws IOException {
-        HttpSession session = request.getSession(false);
-        String username = session == null ? null : (String) session.getAttribute("username");
-        if (username == null) {
-            response.sendRedirect(request.getContextPath() + "/login?error=1");
-            return false;
-        }
-        if (!"admin".equalsIgnoreCase(username)) {
-            response.sendError(HttpServletResponse.SC_FORBIDDEN, "Access denied");
-            return false;
-        }
-        return true;
     }
 
     private List<String> validate(Payment payment) {

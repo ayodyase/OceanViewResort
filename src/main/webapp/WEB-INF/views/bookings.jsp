@@ -226,21 +226,21 @@
             <div class="form-row">
               <div class="field">
                 <label for="guest-name">Guest name</label>
-                <input class="input" id="guest-name" name="guestName" type="text" required value="<c:out value='${bookingForm.guestName}'/>" />
+                  <input class="input" id="guest-name" name="guestName" type="text" required value="<c:out value='${bookingForm.guestName}'/>" <c:if test="${!canEdit}">disabled</c:if> />
               </div>
               <div class="field">
                 <label for="guest-email">Guest email</label>
-                <input class="input" id="guest-email" name="guestEmail" type="email" required value="<c:out value='${bookingForm.guestEmail}'/>" />
+                  <input class="input" id="guest-email" name="guestEmail" type="email" required value="<c:out value='${bookingForm.guestEmail}'/>" <c:if test="${!canEdit}">disabled</c:if> />
               </div>
             </div>
             <div class="form-row">
               <div class="field">
                 <label for="room-number">Room number</label>
-                <input class="input" id="room-number" name="roomNumber" type="text" required value="<c:out value='${bookingForm.roomNumber}'/>" />
+                  <input class="input" id="room-number" name="roomNumber" type="text" required value="<c:out value='${bookingForm.roomNumber}'/>" <c:if test="${!canEdit}">disabled</c:if> />
               </div>
               <div class="field">
                 <label for="status">Status</label>
-                <select class="select" id="status" name="status">
+                  <select class="select" id="status" name="status" <c:if test="${!canEdit}">disabled</c:if>>
                   <option value="Confirmed" <c:if test="${bookingForm.status == 'Confirmed'}">selected</c:if>>Confirmed</option>
                   <option value="Cancelled" <c:if test="${bookingForm.status == 'Cancelled'}">selected</c:if>>Cancelled</option>
                 </select>
@@ -249,19 +249,21 @@
             <div class="form-row">
               <div class="field">
                 <label for="check-in">Check-in date</label>
-                <input class="input" id="check-in" name="checkInDate" type="date" required value="<c:out value='${bookingForm.checkInDate}'/>" />
+                  <input class="input" id="check-in" name="checkInDate" type="date" required value="<c:out value='${bookingForm.checkInDate}'/>" <c:if test="${!canEdit}">disabled</c:if> />
               </div>
               <div class="field">
                 <label for="check-out">Check-out date</label>
-                <input class="input" id="check-out" name="checkOutDate" type="date" required value="<c:out value='${bookingForm.checkOutDate}'/>" />
+                  <input class="input" id="check-out" name="checkOutDate" type="date" required value="<c:out value='${bookingForm.checkOutDate}'/>" <c:if test="${!canEdit}">disabled</c:if> />
               </div>
             </div>
-            <div class="header-actions">
-              <button class="btn" type="submit">Save Booking</button>
-              <a class="btn-link" href="${pageContext.request.contextPath}/bookings">
-                <button class="btn btn-secondary" type="button">Clear Form</button>
-              </a>
-            </div>
+              <c:if test="${canEdit}">
+                <div class="header-actions">
+                  <button class="btn" type="submit">Save Booking</button>
+                  <a class="btn-link" href="${pageContext.request.contextPath}/bookings">
+                    <button class="btn btn-secondary" type="button">Clear Form</button>
+                  </a>
+                </div>
+              </c:if>
           </form>
         </div>
 
@@ -274,7 +276,9 @@
                 <th>Room</th>
                 <th>Stay</th>
                 <th>Status</th>
-                <th>Actions</th>
+                  <c:if test="${canEdit}">
+                    <th>Actions</th>
+                  </c:if>
               </tr>
             </thead>
             <tbody>
@@ -287,24 +291,33 @@
                   <td><c:out value="${booking.roomNumber}" /></td>
                   <td><c:out value="${booking.checkInDate}" /> to <c:out value="${booking.checkOutDate}" /></td>
                   <td><c:out value="${booking.status}" /></td>
-                  <td>
-                    <div class="inline-actions">
-                      <form class="inline-form" method="get" action="${pageContext.request.contextPath}/bookings">
-                        <input type="hidden" name="editId" value="<c:out value='${booking.id}'/>" />
-                        <button class="btn btn-secondary" type="submit">Edit</button>
-                      </form>
-                      <form class="inline-form" method="post" action="${pageContext.request.contextPath}/bookings/delete">
-                        <input type="hidden" name="id" value="<c:out value='${booking.id}'/>" />
-                        <button class="btn btn-danger" type="submit">Delete</button>
-                      </form>
-                    </div>
-                  </td>
+                    <c:if test="${canEdit}">
+                      <td>
+                        <div class="inline-actions">
+                          <form class="inline-form" method="get" action="${pageContext.request.contextPath}/bookings">
+                            <input type="hidden" name="editId" value="<c:out value='${booking.id}'/>" />
+                            <button class="btn btn-secondary" type="submit">Edit</button>
+                          </form>
+                          <form class="inline-form" method="post" action="${pageContext.request.contextPath}/bookings/delete">
+                            <input type="hidden" name="id" value="<c:out value='${booking.id}'/>" />
+                            <button class="btn btn-danger" type="submit">Delete</button>
+                          </form>
+                        </div>
+                      </td>
+                    </c:if>
                 </tr>
               </c:forEach>
               <c:if test="${empty bookingList}">
-                <tr>
-                  <td colspan="5">No bookings yet.</td>
-                </tr>
+                  <tr>
+                    <c:choose>
+                      <c:when test="${canEdit}">
+                        <td colspan="5">No bookings yet.</td>
+                      </c:when>
+                      <c:otherwise>
+                        <td colspan="4">No bookings yet.</td>
+                      </c:otherwise>
+                    </c:choose>
+                  </tr>
               </c:if>
             </tbody>
           </table>

@@ -11,6 +11,7 @@ public class StaffMember {
     private String hoursStart;
     private String hoursEnd;
     private String status;
+    private String password;
 
     public Integer getId() {
         return id;
@@ -90,5 +91,13 @@ public class StaffMember {
 
     public void setStatus(String status) {
         this.status = status;
+    }
+
+    public String getPassword() {
+        return password;
+    }
+
+    public void setPassword(String password) {
+        this.password = password;
     }
 }

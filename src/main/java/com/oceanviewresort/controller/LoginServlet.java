@@ -1,5 +1,7 @@
 package com.oceanviewresort.controller;
 
+import com.oceanviewresort.model.StaffAuthDao;
+import com.oceanviewresort.model.StaffAuthResult;
 import com.oceanviewresort.model.UserDAO;
 
 import javax.servlet.ServletConfig;
@@ -12,6 +14,7 @@ import java.io.IOException;
 
 public class LoginServlet extends HttpServlet {
     private UserDAO userDAO;
+    private StaffAuthDao staffAuthDao;
 
     @Override
     public void init(ServletConfig config) throws ServletException {
@@ -20,6 +23,7 @@ public class LoginServlet extends HttpServlet {
         String dbUser = getConfigValue(config, "DB_USER");
         String dbPassword = getConfigValue(config, "DB_PASSWORD");
         userDAO = new UserDAO(dbUrl, dbUser, dbPassword);
+        staffAuthDao = new StaffAuthDao(dbUrl, dbUser, dbPassword);
     }
 
     @Override
@@ -33,13 +37,9 @@ public class LoginServlet extends HttpServlet {
             return;
         }
 
-        boolean valid = userDAO.validateUser(username, password);
-        if (valid) {
-            if (!"admin".equalsIgnoreCase(username)) {
-                request.setAttribute("error", "Access denied.");
-                request.getRequestDispatcher("/login.jsp").forward(request, response);
-                return;
-            }
+        boolean adminValid = userDAO.validateUser(username, password);
+        StaffAuthResult staffResult = adminValid ? null : staffAuthDao.validateStaff(username, password);
+        if (adminValid || staffResult != null) {
             HttpSession existing = request.getSession(false);
             if (existing != null) {
                 existing.invalidate();
@@ -47,6 +47,12 @@ public class LoginServlet extends HttpServlet {
 
             HttpSession session = request.getSession(true);
             session.setAttribute("username", username);
+            if (adminValid) {
+                session.setAttribute("role", "Admin");
+            } else {
+                session.setAttribute("role", staffResult.getRole());
+                session.setAttribute("displayName", staffResult.getName());
+            }
             session.setMaxInactiveInterval(15 * 60);
 
             response.sendRedirect(request.getContextPath() + "/admin");

@@ -25,10 +25,6 @@ public class AdminServlet extends HttpServlet {
             response.sendRedirect(request.getContextPath() + "/login?error=1");
             return;
         }
-        if (!"admin".equalsIgnoreCase(username)) {
-            response.sendError(HttpServletResponse.SC_FORBIDDEN, "Access denied");
-            return;
-        }
 
         String dbUrl = getConfigValue(request, "DB_URL");
         String dbUser = getConfigValue(request, "DB_USER");

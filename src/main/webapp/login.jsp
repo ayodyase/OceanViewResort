@@ -143,10 +143,10 @@
     </div>
 
     <form method="post" action="${pageContext.request.contextPath}/login" autocomplete="off">
-      <div class="field">
-        <label for="username">Username</label>
-        <input id="username" name="username" type="text" required maxlength="50" />
-      </div>
+        <div class="field">
+          <label for="username">Username</label>
+          <input id="username" name="username" type="text" required maxlength="50" />
+        </div>
       <div class="field">
         <label for="password">Password</label>
         <input id="password" name="password" type="password" required maxlength="72" />

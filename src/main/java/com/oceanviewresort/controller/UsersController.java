@@ -15,6 +15,8 @@ import javax.servlet.http.HttpSession;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
+import com.oceanviewresort.security.AccessUtil;
+import com.oceanviewresort.model.PasswordUtil;
 
 @Controller
 @RequestMapping("/users")
@@ -30,9 +32,12 @@ public class UsersController {
                             Model model,
                             HttpServletRequest request,
                             HttpServletResponse response) throws IOException {
-        if (!ensureAdmin(request, response)) {
+        if (!AccessUtil.ensureLoggedIn(request, response)) {
             return null;
         }
+
+        HttpSession session = request.getSession(false);
+        model.addAttribute("canEdit", AccessUtil.canEdit(session));
 
         StaffMember form = new StaffMember();
         if (editId != null) {
@@ -54,7 +59,7 @@ public class UsersController {
                             Model model,
                             HttpServletRequest request,
                             HttpServletResponse response) throws IOException {
-        if (!ensureAdmin(request, response)) {
+        if (!AccessUtil.ensureCanEdit(request, response)) {
             return null;
         }
 
@@ -78,25 +83,31 @@ public class UsersController {
     public String deleteStaff(@RequestParam("id") int id,
                               HttpServletRequest request,
                               HttpServletResponse response) throws IOException {
-        if (!ensureAdmin(request, response)) {
+        if (!AccessUtil.ensureCanEdit(request, response)) {
             return null;
         }
         staffDao.delete(id);
         return "redirect:/users";
     }
 
-    private boolean ensureAdmin(HttpServletRequest request, HttpServletResponse response) throws IOException {
-        HttpSession session = request.getSession(false);
-        String username = session == null ? null : (String) session.getAttribute("username");
-        if (username == null) {
-            response.sendRedirect(request.getContextPath() + "/login?error=1");
-            return false;
+    @PostMapping("/reset-password")
+    public String resetPassword(@RequestParam("id") int id,
+                                HttpServletRequest request,
+                                HttpServletResponse response,
+                                Model model) throws IOException {
+        if (!AccessUtil.ensureCanEdit(request, response)) {
+            return null;
         }
-        if (!"admin".equalsIgnoreCase(username)) {
-            response.sendError(HttpServletResponse.SC_FORBIDDEN, "Access denied");
-            return false;
+        StaffMember staff = staffDao.findById(id);
+        if (staff == null || isBlank(staff.getEmployeeId())) {
+            model.addAttribute("staffForm", new StaffMember());
+            model.addAttribute("staffList", staffDao.findAll());
+            model.addAttribute("errorMessage", "Unable to reset password for the selected staff member.");
+            return "users";
         }
-        return true;
+        String newHash = PasswordUtil.hashPassword(staff.getEmployeeId());
+        staffDao.updatePasswordHash(id, newHash);
+        return "redirect:/users";
     }
 
     private List<String> validate(StaffMember staff) {
@@ -118,6 +129,9 @@ public class UsersController {
         }
         if (isBlank(staff.getStatus())) {
             errors.add("Activation status is required.");
+        }
+        if (staff.getId() == null && isBlank(staff.getPassword())) {
+            errors.add("Password is required for new staff.");
         }
         return errors;
     }

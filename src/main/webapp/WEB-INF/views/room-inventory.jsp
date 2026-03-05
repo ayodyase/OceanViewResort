@@ -217,11 +217,11 @@
             <div class="form-row">
               <div class="field">
                 <label for="room-number">Room Number</label>
-                <input class="input" id="room-number" name="roomNumber" type="text" required value="<c:out value='${roomForm.roomNumber}'/>" />
+                  <input class="input" id="room-number" name="roomNumber" type="text" required value="<c:out value='${roomForm.roomNumber}'/>" <c:if test="${!canEdit}">disabled</c:if> />
               </div>
               <div class="field">
                 <label for="room-type">Room Type</label>
-                <select class="select" id="room-type" name="roomType">
+                  <select class="select" id="room-type" name="roomType" <c:if test="${!canEdit}">disabled</c:if>>
                   <option value="Standard" <c:if test="${roomForm.roomType == 'Standard'}">selected</c:if>>Standard</option>
                   <option value="Deluxe" <c:if test="${roomForm.roomType == 'Deluxe'}">selected</c:if>>Deluxe</option>
                   <option value="Family" <c:if test="${roomForm.roomType == 'Family'}">selected</c:if>>Family</option>
@@ -231,22 +231,24 @@
             <div class="form-row">
               <div class="field">
                 <label for="room-capacity">Capacity</label>
-                <input class="input" id="room-capacity" name="capacity" type="number" min="1" max="8" required value="<c:out value='${roomForm.capacity}'/>" />
+                  <input class="input" id="room-capacity" name="capacity" type="number" min="1" max="8" required value="<c:out value='${roomForm.capacity}'/>" <c:if test="${!canEdit}">disabled</c:if> />
               </div>
               <div class="field">
                 <label for="room-status">Status</label>
-                <select class="select" id="room-status" name="status">
+                  <select class="select" id="room-status" name="status" <c:if test="${!canEdit}">disabled</c:if>>
                   <option value="Available" <c:if test="${roomForm.status == 'Available'}">selected</c:if>>Available</option>
                   <option value="Non-Available" <c:if test="${roomForm.status == 'Non-Available'}">selected</c:if>>Non-Available</option>
                 </select>
               </div>
             </div>
-            <div class="header-actions">
-              <button class="btn" type="submit">Save Room</button>
-              <a class="btn-link" href="${pageContext.request.contextPath}/rooms/inventory">
-                <button class="btn btn-secondary" type="button">Clear Form</button>
-              </a>
-            </div>
+            <c:if test="${canEdit}">
+              <div class="header-actions">
+                <button class="btn" type="submit">Save Room</button>
+                <a class="btn-link" href="${pageContext.request.contextPath}/rooms/inventory">
+                  <button class="btn btn-secondary" type="button">Clear Form</button>
+                </a>
+              </div>
+            </c:if>
           </form>
         </div>
 
@@ -259,7 +261,9 @@
                 <th>Type</th>
                 <th>Capacity</th>
                 <th>Status</th>
-                <th>Actions</th>
+                  <c:if test="${canEdit}">
+                    <th>Actions</th>
+                  </c:if>
               </tr>
             </thead>
             <tbody>
@@ -269,24 +273,33 @@
                   <td><c:out value="${room.roomType}" /></td>
                   <td><c:out value="${room.capacity}" /></td>
                   <td><c:out value="${room.status}" /></td>
-                  <td>
-                    <div class="inline-actions">
-                      <form class="inline-form" method="get" action="${pageContext.request.contextPath}/rooms/inventory">
-                        <input type="hidden" name="editId" value="<c:out value='${room.id}'/>" />
-                        <button class="btn btn-secondary" type="submit">Edit</button>
-                      </form>
-                      <form class="inline-form" method="post" action="${pageContext.request.contextPath}/rooms/inventory/delete">
-                        <input type="hidden" name="id" value="<c:out value='${room.id}'/>" />
-                        <button class="btn btn-danger" type="submit">Delete</button>
-                      </form>
-                    </div>
-                  </td>
+                    <c:if test="${canEdit}">
+                      <td>
+                        <div class="inline-actions">
+                          <form class="inline-form" method="get" action="${pageContext.request.contextPath}/rooms/inventory">
+                            <input type="hidden" name="editId" value="<c:out value='${room.id}'/>" />
+                            <button class="btn btn-secondary" type="submit">Edit</button>
+                          </form>
+                          <form class="inline-form" method="post" action="${pageContext.request.contextPath}/rooms/inventory/delete">
+                            <input type="hidden" name="id" value="<c:out value='${room.id}'/>" />
+                            <button class="btn btn-danger" type="submit">Delete</button>
+                          </form>
+                        </div>
+                      </td>
+                    </c:if>
                 </tr>
               </c:forEach>
               <c:if test="${empty roomList}">
-                <tr>
-                  <td colspan="5">No rooms yet.</td>
-                </tr>
+                  <tr>
+                    <c:choose>
+                      <c:when test="${canEdit}">
+                        <td colspan="5">No rooms yet.</td>
+                      </c:when>
+                      <c:otherwise>
+                        <td colspan="4">No rooms yet.</td>
+                      </c:otherwise>
+                    </c:choose>
+                  </tr>
               </c:if>
             </tbody>
           </table>

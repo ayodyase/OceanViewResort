@@ -18,6 +18,7 @@ import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.util.ArrayList;
 import java.util.List;
+import com.oceanviewresort.security.AccessUtil;
 
 @Controller
 @RequestMapping("/rooms")
@@ -36,7 +37,7 @@ public class RoomsController {
 
     @GetMapping({"", "/"})
     public String roomsPage(HttpServletRequest request, HttpServletResponse response) throws IOException {
-        if (!ensureAdmin(request, response)) {
+        if (!AccessUtil.ensureLoggedIn(request, response)) {
             return null;
         }
         return "rooms";
@@ -47,9 +48,11 @@ public class RoomsController {
                                     Model model,
                                     HttpServletRequest request,
                                     HttpServletResponse response) throws IOException {
-        if (!ensureAdmin(request, response)) {
+        if (!AccessUtil.ensureLoggedIn(request, response)) {
             return null;
         }
+        HttpSession session = request.getSession(false);
+        model.addAttribute("canEdit", AccessUtil.canEdit(session));
         com.oceanviewresort.model.Room form = new com.oceanviewresort.model.Room();
         if (editId != null) {
             com.oceanviewresort.model.Room existing = roomDao.findById(editId);
@@ -69,9 +72,11 @@ public class RoomsController {
                                 Model model,
                                 HttpServletRequest request,
                                 HttpServletResponse response) throws IOException {
-        if (!ensureAdmin(request, response)) {
+        if (!AccessUtil.ensureLoggedIn(request, response)) {
             return null;
         }
+        HttpSession session = request.getSession(false);
+        model.addAttribute("canEdit", AccessUtil.canEdit(session));
         com.oceanviewresort.model.RoomRate form = new com.oceanviewresort.model.RoomRate();
         if (editId != null) {
             com.oceanviewresort.model.RoomRate existing = roomRateDao.findById(editId);
@@ -91,7 +96,7 @@ public class RoomsController {
                                Model model,
                                HttpServletRequest request,
                                HttpServletResponse response) throws IOException {
-        if (!ensureAdmin(request, response)) {
+        if (!AccessUtil.ensureCanEdit(request, response)) {
             return null;
         }
         List<String> errors = validateRate(rate);
@@ -113,7 +118,7 @@ public class RoomsController {
     public String deleteRoomRate(@RequestParam("id") int id,
                                  HttpServletRequest request,
                                  HttpServletResponse response) throws IOException {
-        if (!ensureAdmin(request, response)) {
+        if (!AccessUtil.ensureCanEdit(request, response)) {
             return null;
         }
         roomRateDao.delete(id);
@@ -125,9 +130,11 @@ public class RoomsController {
                                        Model model,
                                        HttpServletRequest request,
                                        HttpServletResponse response) throws IOException {
-        if (!ensureAdmin(request, response)) {
+        if (!AccessUtil.ensureLoggedIn(request, response)) {
             return null;
         }
+        HttpSession session = request.getSession(false);
+        model.addAttribute("canEdit", AccessUtil.canEdit(session));
         com.oceanviewresort.model.RoomAvailability form = new com.oceanviewresort.model.RoomAvailability();
         if (editId != null) {
             com.oceanviewresort.model.RoomAvailability existing = roomAvailabilityDao.findById(editId);
@@ -156,7 +163,7 @@ public class RoomsController {
                                    Model model,
                                    HttpServletRequest request,
                                    HttpServletResponse response) throws IOException {
-        if (!ensureAdmin(request, response)) {
+        if (!AccessUtil.ensureCanEdit(request, response)) {
             return null;
         }
         List<String> errors = validateAvailability(availability);
@@ -178,7 +185,7 @@ public class RoomsController {
     public String deleteAvailability(@RequestParam("id") int id,
                                      HttpServletRequest request,
                                      HttpServletResponse response) throws IOException {
-        if (!ensureAdmin(request, response)) {
+        if (!AccessUtil.ensureCanEdit(request, response)) {
             return null;
         }
         roomAvailabilityDao.delete(id);
@@ -190,7 +197,7 @@ public class RoomsController {
                            Model model,
                            HttpServletRequest request,
                            HttpServletResponse response) throws IOException {
-        if (!ensureAdmin(request, response)) {
+        if (!AccessUtil.ensureCanEdit(request, response)) {
             return null;
         }
 
@@ -214,25 +221,11 @@ public class RoomsController {
     public String deleteRoom(@RequestParam("id") int id,
                              HttpServletRequest request,
                              HttpServletResponse response) throws IOException {
-        if (!ensureAdmin(request, response)) {
+        if (!AccessUtil.ensureCanEdit(request, response)) {
             return null;
         }
         roomDao.delete(id);
         return "redirect:/rooms/inventory";
-    }
-
-    private boolean ensureAdmin(HttpServletRequest request, HttpServletResponse response) throws IOException {
-        HttpSession session = request.getSession(false);
-        String username = session == null ? null : (String) session.getAttribute("username");
-        if (username == null) {
-            response.sendRedirect(request.getContextPath() + "/login?error=1");
-            return false;
-        }
-        if (!"admin".equalsIgnoreCase(username)) {
-            response.sendError(HttpServletResponse.SC_FORBIDDEN, "Access denied");
-            return false;
-        }
-        return true;
     }
 
     private List<String> validate(com.oceanviewresort.model.Room room) {

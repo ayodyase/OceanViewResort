@@ -1,16 +1,10 @@
 package com.oceanviewresort.model;
 
-import javax.crypto.SecretKeyFactory;
-import javax.crypto.spec.PBEKeySpec;
-import java.security.MessageDigest;
-import java.security.NoSuchAlgorithmException;
-import java.security.spec.InvalidKeySpecException;
 import java.sql.Connection;
 import java.sql.DriverManager;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
-import java.util.Base64;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
@@ -55,7 +49,7 @@ public class UserDAO {
                     return false;
                 }
                 String storedHash = resultSet.getString("password_hash");
-                return verifyPassword(password, storedHash);
+                return PasswordUtil.verifyPassword(password, storedHash);
             }
         } catch (SQLException | IllegalArgumentException ex) {
             LOGGER.log(Level.WARNING, "User validation failed", ex);
@@ -63,29 +57,21 @@ public class UserDAO {
         }
     }
 
-    private boolean verifyPassword(String password, String stored) {
-        if (stored == null || stored.trim().isEmpty()) {
-            return false;
+    public void updatePasswordHash(String username, String passwordHash) {
+        if (username == null || username.trim().isEmpty() || passwordHash == null || passwordHash.trim().isEmpty()) {
+            return;
         }
-        String[] parts = stored.split(":");
-        if (parts.length != 3) {
-            return false;
+        if (dbUrl == null || dbUrl.trim().isEmpty()) {
+            return;
         }
-
-        int iterations = Integer.parseInt(parts[0]);
-        byte[] salt = Base64.getDecoder().decode(parts[1]);
-        byte[] expected = Base64.getDecoder().decode(parts[2]);
-        byte[] actual = pbkdf2(password.toCharArray(), salt, iterations, expected.length * 8);
-        return MessageDigest.isEqual(expected, actual);
-    }
-
-    private byte[] pbkdf2(char[] password, byte[] salt, int iterations, int keyLength) {
-        try {
-            PBEKeySpec spec = new PBEKeySpec(password, salt, iterations, keyLength);
-            SecretKeyFactory factory = SecretKeyFactory.getInstance("PBKDF2WithHmacSHA256");
-            return factory.generateSecret(spec).getEncoded();
-        } catch (NoSuchAlgorithmException | InvalidKeySpecException ex) {
-            throw new IllegalArgumentException("Password verification failed", ex);
+        String sql = "UPDATE users SET password_hash = ? WHERE username = ?";
+        try (Connection connection = DriverManager.getConnection(dbUrl, dbUser, dbPassword);
+             PreparedStatement statement = connection.prepareStatement(sql)) {
+            statement.setString(1, passwordHash);
+            statement.setString(2, username);
+            statement.executeUpdate();
+        } catch (SQLException ex) {
+            LOGGER.log(Level.WARNING, "Failed to update user password hash", ex);
         }
     }
 }

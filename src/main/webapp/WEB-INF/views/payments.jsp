@@ -241,21 +241,21 @@
             <div class="form-row">
               <div class="field">
                 <label for="booking-reference">Billing Reference</label>
-                <input class="input" id="booking-reference" name="bookingReference" type="text" required value="<c:out value='${paymentForm.bookingReference}'/>" />
+                  <input class="input" id="booking-reference" name="bookingReference" type="text" required value="<c:out value='${paymentForm.bookingReference}'/>" <c:if test="${!canEdit}">disabled</c:if> />
               </div>
               <div class="field">
                 <label for="guest-name">Guest name</label>
-                <input class="input" id="guest-name" name="guestName" type="text" required value="<c:out value='${paymentForm.guestName}'/>" />
+                  <input class="input" id="guest-name" name="guestName" type="text" required value="<c:out value='${paymentForm.guestName}'/>" <c:if test="${!canEdit}">disabled</c:if> />
               </div>
             </div>
             <div class="form-row">
               <div class="field">
                 <label for="amount">Amount</label>
-                <input class="input" id="amount" name="amount" type="number" min="0.01" step="0.01" required value="<c:out value='${paymentForm.amount}'/>" />
+                  <input class="input" id="amount" name="amount" type="number" min="0.01" step="0.01" required value="<c:out value='${paymentForm.amount}'/>" <c:if test="${!canEdit}">disabled</c:if> />
               </div>
               <div class="field">
                 <label for="method">Method</label>
-                <select class="select" id="method" name="method">
+                  <select class="select" id="method" name="method" <c:if test="${!canEdit}">disabled</c:if>>
                   <option value="Cash" <c:if test="${paymentForm.method == 'Cash'}">selected</c:if>>Cash</option>
                   <option value="Card" <c:if test="${paymentForm.method == 'Card'}">selected</c:if>>Card</option>
                   <option value="Bank Transfer" <c:if test="${paymentForm.method == 'Bank Transfer'}">selected</c:if>>Bank Transfer</option>
@@ -265,23 +265,25 @@
             <div class="form-row">
               <div class="field">
                 <label for="payment-date">Payment date</label>
-                <input class="input" id="payment-date" name="paymentDate" type="date" required value="<c:out value='${paymentForm.paymentDate}'/>" />
+                  <input class="input" id="payment-date" name="paymentDate" type="date" required value="<c:out value='${paymentForm.paymentDate}'/>" <c:if test="${!canEdit}">disabled</c:if> />
               </div>
               <div class="field">
                 <label for="status">Status</label>
-                <select class="select" id="status" name="status">
+                  <select class="select" id="status" name="status" <c:if test="${!canEdit}">disabled</c:if>>
                   <option value="Paid" <c:if test="${paymentForm.status == 'Paid'}">selected</c:if>>Paid</option>
                   <option value="Pending" <c:if test="${paymentForm.status == 'Pending'}">selected</c:if>>Pending</option>
                   <option value="Failed" <c:if test="${paymentForm.status == 'Failed'}">selected</c:if>>Failed</option>
                 </select>
               </div>
             </div>
-            <div class="header-actions">
-              <button class="btn" type="submit">Save Payment</button>
-              <a class="btn-link" href="${pageContext.request.contextPath}/payments">
-                <button class="btn btn-secondary" type="button">Clear Form</button>
-              </a>
-            </div>
+            <c:if test="${canEdit}">
+              <div class="header-actions">
+                <button class="btn" type="submit">Save Payment</button>
+                <a class="btn-link" href="${pageContext.request.contextPath}/payments">
+                  <button class="btn btn-secondary" type="button">Clear Form</button>
+                </a>
+              </div>
+            </c:if>
           </form>
         </div>
 
@@ -295,7 +297,9 @@
                 <th>Amount</th>
                 <th>Method</th>
                 <th>Status</th>
-                <th>Actions</th>
+                  <c:if test="${canEdit || canPrint}">
+                    <th>Actions</th>
+                  </c:if>
               </tr>
             </thead>
             <tbody>
@@ -306,27 +310,38 @@
                   <td><c:out value="${payment.amount}" /></td>
                   <td><c:out value="${payment.method}" /></td>
                   <td><c:out value="${payment.status}" /></td>
-                  <td>
-                    <div class="inline-actions">
-                      <form class="inline-form" method="get" action="${pageContext.request.contextPath}/payments">
-                        <input type="hidden" name="editId" value="<c:out value='${payment.id}'/>" />
-                        <button class="btn btn-secondary" type="submit">Edit</button>
-                      </form>
-                      <form class="inline-form" method="post" action="${pageContext.request.contextPath}/payments/delete">
-                        <input type="hidden" name="id" value="<c:out value='${payment.id}'/>" />
-                        <button class="btn btn-danger" type="submit">Delete</button>
-                      </form>
-                      <button class="btn" type="button" onclick="printPayment(this)">
-                        Print
-                      </button>
-                    </div>
-                  </td>
+                    <c:if test="${canEdit || canPrint}">
+                      <td>
+                        <div class="inline-actions">
+                          <c:if test="${canEdit}">
+                            <form class="inline-form" method="get" action="${pageContext.request.contextPath}/payments">
+                              <input type="hidden" name="editId" value="<c:out value='${payment.id}'/>" />
+                              <button class="btn btn-secondary" type="submit">Edit</button>
+                            </form>
+                            <form class="inline-form" method="post" action="${pageContext.request.contextPath}/payments/delete">
+                              <input type="hidden" name="id" value="<c:out value='${payment.id}'/>" />
+                              <button class="btn btn-danger" type="submit">Delete</button>
+                            </form>
+                          </c:if>
+                          <button class="btn print-btn" type="button" data-print="payment">
+                            Print
+                          </button>
+                        </div>
+                      </td>
+                    </c:if>
                 </tr>
               </c:forEach>
               <c:if test="${empty paymentList}">
-                <tr>
-                  <td colspan="6">No payments yet.</td>
-                </tr>
+                  <tr>
+                    <c:choose>
+                      <c:when test="${canEdit || canPrint}">
+                        <td colspan="6">No payments yet.</td>
+                      </c:when>
+                      <c:otherwise>
+                        <td colspan="5">No payments yet.</td>
+                      </c:otherwise>
+                    </c:choose>
+                  </tr>
               </c:if>
             </tbody>
           </table>
@@ -334,50 +349,6 @@
       </div>
     </section>
   </main>
-  <script>
-    function printPayment(button) {
-      const row = button.closest("tr");
-      const cells = row ? row.querySelectorAll("td") : [];
-      const reference = cells[0]?.textContent?.trim() || "";
-      const guest = cells[1]?.textContent?.trim() || "";
-      const amount = cells[2]?.textContent?.trim() || "";
-      const method = cells[3]?.textContent?.trim() || "";
-      const status = cells[4]?.textContent?.trim() || "";
-      const date = row?.dataset.date || "";
-      const win = window.open("", "_blank", "width=720,height=640");
-      if (!win) return;
-      const html =
-        "<!DOCTYPE html>" +
-        "<html lang='en'>" +
-        "<head>" +
-        "<meta charset='UTF-8' />" +
-        "<title>Payment Receipt</title>" +
-  <link rel="icon" href="${pageContext.request.contextPath}/assets/logo.png" />
-        "<style>" +
-        "body { font-family: \"Segoe UI\", Arial, sans-serif; padding: 24px; color: #1f2937; }" +
-        "h1 { font-size: 20px; margin: 0 0 12px; }" +
-        "table { width: 100%; border-collapse: collapse; margin-top: 12px; }" +
-        "td { padding: 8px 6px; border-bottom: 1px solid #e5e7eb; }" +
-        ".label { color: #6b7280; width: 160px; }" +
-        "</style>" +
-        "</head>" +
-        "<body>" +
-        "<h1>Ocean View Resort - Payment Receipt</h1>" +
-        "<table>" +
-        "<tr><td class='label'>Billing Reference</td><td>" + reference + "</td></tr>" +
-        "<tr><td class='label'>Guest Name</td><td>" + guest + "</td></tr>" +
-        "<tr><td class='label'>Amount</td><td>" + amount + "</td></tr>" +
-        "<tr><td class='label'>Method</td><td>" + method + "</td></tr>" +
-        "<tr><td class='label'>Payment Date</td><td>" + date + "</td></tr>" +
-        "<tr><td class='label'>Status</td><td>" + status + "</td></tr>" +
-        "</table>" +
-        "<script>window.onload = function() { window.print(); };<\/script>" +
-        "</body>" +
-        "</html>";
-      win.document.open();
-      win.document.write(html);
-      win.document.close();
-    }
-  </script>
+  <script src="${pageContext.request.contextPath}/assets/print-payment.js"></script>
 </body>
 </html>

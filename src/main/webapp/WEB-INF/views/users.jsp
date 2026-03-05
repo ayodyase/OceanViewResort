@@ -268,14 +268,16 @@
           <h1>Ocean View Resort</h1>
         </div>
       </div>
-      <div class="header-actions">
-        <a class="btn-link" href="${pageContext.request.contextPath}/admin">
-          <button class="btn btn-secondary" type="button">Back to Admin</button>
-        </a>
-        <a class="btn-link" href="${pageContext.request.contextPath}/users">
-          <button class="btn" type="button">Add New Staff</button>
-        </a>
-      </div>
+        <div class="header-actions">
+          <a class="btn-link" href="${pageContext.request.contextPath}/admin">
+            <button class="btn btn-secondary" type="button">Back to Admin</button>
+          </a>
+          <c:if test="${canEdit}">
+            <a class="btn-link" href="${pageContext.request.contextPath}/users">
+              <button class="btn" type="button">Add New Staff</button>
+            </a>
+          </c:if>
+        </div>
     </div>
   </header>
 
@@ -287,11 +289,13 @@
           <div>
             <h3 id="users-section-title">Staff Profiles</h3>
           </div>
-          <div class="actions">
-          <a class="btn-link" href="${pageContext.request.contextPath}/users">
-            <button class="btn btn-secondary" type="button">Manage Staff</button>
-          </a>
-        </div>
+          <c:if test="${canEdit}">
+            <div class="actions">
+              <a class="btn-link" href="${pageContext.request.contextPath}/users">
+                <button class="btn btn-secondary" type="button">Manage Staff</button>
+              </a>
+            </div>
+          </c:if>
       </div>
 
       <c:if test="${not empty errorMessage}">
@@ -327,14 +331,18 @@
                 <input class="input" id="staff-nic" name="nic" type="text" value="<c:out value='${staffForm.nic}'/>" />
               </div>
             </div>
-            <div class="form-row">
-              <div class="field">
-                <label for="staff-employee">Employee ID</label>
-                <input class="input" id="staff-employee" name="employeeId" type="text" required value="<c:out value='${staffForm.employeeId}'/>" />
-              </div>
-              <div class="field">
-                <label for="staff-role">Role</label>
-                <select class="select" id="staff-role" name="role">
+              <div class="form-row">
+                <div class="field">
+                  <label for="staff-employee">Employee ID</label>
+                  <input class="input" id="staff-employee" name="employeeId" type="text" required value="<c:out value='${staffForm.employeeId}'/>" <c:if test="${!canEdit}">disabled</c:if> />
+                </div>
+                <div class="field">
+                  <label for="staff-password">Password</label>
+                  <input class="input" id="staff-password" name="password" type="password" autocomplete="new-password" <c:if test="${!canEdit}">disabled</c:if> />
+                </div>
+                <div class="field">
+                  <label for="staff-role">Role</label>
+                  <select class="select" id="staff-role" name="role" <c:if test="${!canEdit}">disabled</c:if>>
                   <option value="Front Desk" <c:if test="${staffForm.role == 'Front Desk'}">selected</c:if>>Front Desk</option>
                   <option value="Housekeeping" <c:if test="${staffForm.role == 'Housekeeping'}">selected</c:if>>Housekeeping</option>
                   <option value="Maintenance" <c:if test="${staffForm.role == 'Maintenance'}">selected</c:if>>Maintenance</option>
@@ -346,33 +354,35 @@
             <div class="form-row">
               <div class="field">
                 <label for="shift-start">Working hours start</label>
-                <input class="input" id="shift-start" name="hoursStart" type="time" required value="<c:out value='${staffForm.hoursStart}'/>" />
+                  <input class="input" id="shift-start" name="hoursStart" type="time" required value="<c:out value='${staffForm.hoursStart}'/>" <c:if test="${!canEdit}">disabled</c:if> />
+                </div>
+                <div class="field">
+                  <label for="shift-end">Working hours end</label>
+                  <input class="input" id="shift-end" name="hoursEnd" type="time" required value="<c:out value='${staffForm.hoursEnd}'/>" <c:if test="${!canEdit}">disabled</c:if> />
+                </div>
               </div>
-              <div class="field">
-                <label for="shift-end">Working hours end</label>
-                <input class="input" id="shift-end" name="hoursEnd" type="time" required value="<c:out value='${staffForm.hoursEnd}'/>" />
-              </div>
-            </div>
             <div class="field">
               <label>Activation status</label>
               <div class="toggle-group">
-                <label class="toggle">
-                  <input type="radio" name="status" value="Active" <c:if test="${staffForm.status == null || staffForm.status == 'Active'}">checked</c:if> />
-                  Active
-                </label>
-                <label class="toggle">
-                  <input type="radio" name="status" value="Inactive" <c:if test="${staffForm.status == 'Inactive'}">checked</c:if> />
-                  Inactive
-                </label>
+                  <label class="toggle">
+                    <input type="radio" name="status" value="Active" <c:if test="${staffForm.status == null || staffForm.status == 'Active'}">checked</c:if> <c:if test="${!canEdit}">disabled</c:if> />
+                    Active
+                  </label>
+                  <label class="toggle">
+                    <input type="radio" name="status" value="Inactive" <c:if test="${staffForm.status == 'Inactive'}">checked</c:if> <c:if test="${!canEdit}">disabled</c:if> />
+                    Inactive
+                  </label>
+                </div>
               </div>
-            </div>
-            <div class="actions">
-              <button class="btn" type="submit">Save Staff</button>
-              <a class="btn-link" href="${pageContext.request.contextPath}/users">
-                <button class="btn btn-secondary" type="button">Clear Form</button>
-              </a>
-            </div>
-          </form>
+              <c:if test="${canEdit}">
+                <div class="actions">
+                  <button class="btn" type="submit">Save Staff</button>
+                  <a class="btn-link" href="${pageContext.request.contextPath}/users">
+                    <button class="btn btn-secondary" type="button">Clear Form</button>
+                  </a>
+                </div>
+              </c:if>
+            </form>
           <p class="helper">Select a staff member to edit or delete, or add a new staff entry.</p>
         </div>
 
@@ -385,10 +395,12 @@
                 <th>Role</th>
                 <th>Working hours</th>
                 <th>Status</th>
-                <th>Actions</th>
-              </tr>
-            </thead>
-            <tbody>
+                  <c:if test="${canEdit}">
+                    <th>Actions</th>
+                  </c:if>
+                </tr>
+              </thead>
+              <tbody>
               <c:forEach var="staff" items="${staffList}">
                 <tr>
                   <td>
@@ -407,24 +419,37 @@
                       </c:otherwise>
                     </c:choose>
                   </td>
-                  <td>
-                    <div class="inline-actions">
-                      <form class="inline-form" method="get" action="${pageContext.request.contextPath}/users">
-                        <input type="hidden" name="editId" value="<c:out value='${staff.id}'/>" />
-                        <button class="btn btn-secondary" type="submit">Edit</button>
-                      </form>
-                      <form class="inline-form" method="post" action="${pageContext.request.contextPath}/users/delete">
-                        <input type="hidden" name="id" value="<c:out value='${staff.id}'/>" />
-                        <button class="btn btn-danger" type="submit">Delete</button>
-                      </form>
-                    </div>
-                  </td>
-                </tr>
+                    <c:if test="${canEdit}">
+                      <td>
+                        <div class="inline-actions">
+                          <form class="inline-form" method="get" action="${pageContext.request.contextPath}/users">
+                            <input type="hidden" name="editId" value="<c:out value='${staff.id}'/>" />
+                            <button class="btn btn-secondary" type="submit">Edit</button>
+                          </form>
+                          <form class="inline-form" method="post" action="${pageContext.request.contextPath}/users/delete">
+                            <input type="hidden" name="id" value="<c:out value='${staff.id}'/>" />
+                            <button class="btn btn-danger" type="submit">Delete</button>
+                          </form>
+                          <form class="inline-form" method="post" action="${pageContext.request.contextPath}/users/reset-password">
+                            <input type="hidden" name="id" value="<c:out value='${staff.id}'/>" />
+                            <button class="btn btn-secondary" type="submit">Reset Password</button>
+                          </form>
+                        </div>
+                      </td>
+                    </c:if>
+                  </tr>
               </c:forEach>
               <c:if test="${empty staffList}">
-                <tr>
-                  <td colspan="5">No staff records yet.</td>
-                </tr>
+                  <tr>
+                    <c:choose>
+                      <c:when test="${canEdit}">
+                        <td colspan="5">No staff records yet.</td>
+                      </c:when>
+                      <c:otherwise>
+                        <td colspan="4">No staff records yet.</td>
+                      </c:otherwise>
+                    </c:choose>
+                  </tr>
               </c:if>
             </tbody>
           </table>

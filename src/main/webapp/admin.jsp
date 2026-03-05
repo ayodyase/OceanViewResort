@@ -1,5 +1,6 @@
 <%@ page contentType="text/html; charset=UTF-8" language="java" %>
 <%@ taglib uri="http://java.sun.com/jsp/jstl/core" prefix="c" %>
+<%@ taglib uri="http://java.sun.com/jsp/jstl/functions" prefix="fn" %>
 <!DOCTYPE html>
 <html lang="en">
 <head>
@@ -41,6 +42,48 @@
       justify-content: space-between;
       gap: 16px;
       flex-wrap: wrap;
+    }
+    .header-actions {
+      display: flex;
+      align-items: center;
+      gap: 16px;
+    }
+    .user-profile {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      background: #f1f4f9;
+      border-radius: 999px;
+      padding: 8px 14px;
+    }
+    .user-profile-link {
+      text-decoration: none;
+    }
+    .user-avatar {
+      width: 34px;
+      height: 34px;
+      border-radius: 50%;
+      background: #0d4a7c;
+      color: #ffffff;
+      font-weight: 700;
+      display: grid;
+      place-items: center;
+      font-size: 13px;
+      letter-spacing: 0.5px;
+    }
+    .user-meta {
+      display: flex;
+      flex-direction: column;
+      line-height: 1.1;
+    }
+    .user-name {
+      font-weight: 600;
+      font-size: 13px;
+      color: #1b2b3a;
+    }
+    .user-role {
+      font-size: 11px;
+      color: #6c7a89;
     }
     .brand {
       display: flex;
@@ -191,18 +234,41 @@
   </style>
 </head>
 <body>
+  <c:set var="profileName" value="${sessionScope.username}" />
+  <c:if test="${not empty sessionScope.displayName}">
+    <c:set var="profileName" value="${sessionScope.displayName}" />
+  </c:if>
+  <c:if test="${profileName == 'admin'}">
+    <c:set var="profileName" value="Admin" />
+  </c:if>
+  <c:set var="profileRole" value="${sessionScope.role}" />
+  <c:if test="${empty profileRole}">
+    <c:set var="profileRole" value="Admin" />
+  </c:if>
   <header>
     <div class="header-content">
       <div class="brand">
         <img class="brand-logo" src="${pageContext.request.contextPath}/assets/logo.png" alt="Ocean View Resort logo" />
         <div>
           <h1>Ocean View Resort</h1>
-          <span>Administration Panel</span>
+          <span><c:out value="${profileRole}" /></span>
         </div>
       </div>
-      <a class="card-link" href="${pageContext.request.contextPath}/logout">
-        <button class="btn btn-secondary" type="button">Logout</button>
-      </a>
+      <div class="header-actions">
+        <a class="user-profile-link" href="${pageContext.request.contextPath}/profile">
+          <div class="user-profile">
+            <div class="user-avatar">
+              <c:out value="${fn:toUpperCase(fn:substring(profileName, 0, 1))}" />
+            </div>
+            <div class="user-meta">
+            <div class="user-name"><c:out value="${profileName}" /></div>
+            </div>
+          </div>
+        </a>
+        <a class="card-link" href="${pageContext.request.contextPath}/logout">
+          <button class="btn btn-secondary" type="button">Logout</button>
+        </a>
+      </div>
     </div>
   </header>
 

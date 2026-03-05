@@ -29,9 +29,17 @@ public class StaffDao {
         return results.isEmpty() ? null : results.get(0);
     }
 
+    public StaffMember findByEmployeeId(String employeeId) {
+        String sql = "SELECT id, name, email, gender, nic, employee_id, role, hours_start, hours_end, status " +
+                "FROM staff WHERE employee_id = ?";
+        List<StaffMember> results = jdbcTemplate.query(sql, staffRowMapper(), employeeId);
+        return results.isEmpty() ? null : results.get(0);
+    }
+
     public void create(StaffMember staff) {
-        String sql = "INSERT INTO staff (name, email, gender, nic, employee_id, role, hours_start, hours_end, status) " +
-                "VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?)";
+        String sql = "INSERT INTO staff (name, email, gender, nic, employee_id, role, hours_start, hours_end, status, password_hash) " +
+                "VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?)";
+        String passwordHash = PasswordUtil.hashPassword(staff.getPassword());
         jdbcTemplate.update(sql,
                 trim(staff.getName()),
                 trim(staff.getEmail()),
@@ -41,11 +49,32 @@ public class StaffDao {
                 trim(staff.getRole()),
                 trim(staff.getHoursStart()),
                 trim(staff.getHoursEnd()),
-                trim(staff.getStatus())
+                trim(staff.getStatus()),
+                passwordHash
         );
     }
 
     public void update(StaffMember staff) {
+        if (hasText(staff.getPassword())) {
+            String sql = "UPDATE staff SET name = ?, email = ?, gender = ?, nic = ?, employee_id = ?, role = ?, " +
+                    "hours_start = ?, hours_end = ?, status = ?, password_hash = ? WHERE id = ?";
+            String passwordHash = PasswordUtil.hashPassword(staff.getPassword());
+            jdbcTemplate.update(sql,
+                    trim(staff.getName()),
+                    trim(staff.getEmail()),
+                    trim(staff.getGender()),
+                    trim(staff.getNic()),
+                    trim(staff.getEmployeeId()),
+                    trim(staff.getRole()),
+                    trim(staff.getHoursStart()),
+                    trim(staff.getHoursEnd()),
+                    trim(staff.getStatus()),
+                    passwordHash,
+                    staff.getId()
+            );
+            return;
+        }
+
         String sql = "UPDATE staff SET name = ?, email = ?, gender = ?, nic = ?, employee_id = ?, role = ?, " +
                 "hours_start = ?, hours_end = ?, status = ? WHERE id = ?";
         jdbcTemplate.update(sql,
@@ -64,6 +93,11 @@ public class StaffDao {
 
     public void delete(int id) {
         jdbcTemplate.update("DELETE FROM staff WHERE id = ?", id);
+    }
+
+    public void updatePasswordHash(int id, String passwordHash) {
+        String sql = "UPDATE staff SET password_hash = ? WHERE id = ?";
+        jdbcTemplate.update(sql, passwordHash, id);
     }
 
     private RowMapper<StaffMember> staffRowMapper() {
@@ -88,5 +122,9 @@ public class StaffDao {
 
     private String trim(String value) {
         return value == null ? "" : value.trim();
+    }
+
+    private boolean hasText(String value) {
+        return value != null && !value.trim().isEmpty();
     }
 }

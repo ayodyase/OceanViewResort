@@ -221,38 +221,40 @@
             <div class="form-row">
               <div class="field">
                 <label for="room-type">Room type</label>
-                <input class="input" id="room-type" name="roomType" type="text" required value="<c:out value='${rateForm.roomType}'/>" />
+                  <input class="input" id="room-type" name="roomType" type="text" required value="<c:out value='${rateForm.roomType}'/>" <c:if test="${!canEdit}">disabled</c:if> />
               </div>
               <div class="field">
                 <label for="season">Season</label>
-                <input class="input" id="season" name="season" type="text" required value="<c:out value='${rateForm.season}'/>" />
+                  <input class="input" id="season" name="season" type="text" required value="<c:out value='${rateForm.season}'/>" <c:if test="${!canEdit}">disabled</c:if> />
               </div>
             </div>
             <div class="form-row">
               <div class="field">
                 <label for="nightly-rate">Nightly rate</label>
-                <input class="input" id="nightly-rate" name="nightlyRate" type="number" min="1" step="0.01" required value="<c:out value='${rateForm.nightlyRate}'/>" />
+                  <input class="input" id="nightly-rate" name="nightlyRate" type="number" min="1" step="0.01" required value="<c:out value='${rateForm.nightlyRate}'/>" <c:if test="${!canEdit}">disabled</c:if> />
               </div>
               <div class="field">
                 <label for="package-name">Package name</label>
-                <input class="input" id="package-name" name="packageName" type="text" value="<c:out value='${rateForm.packageName}'/>" />
+                  <input class="input" id="package-name" name="packageName" type="text" value="<c:out value='${rateForm.packageName}'/>" <c:if test="${!canEdit}">disabled</c:if> />
               </div>
             </div>
             <div class="form-row">
               <div class="field">
                 <label for="status">Status</label>
-                <select class="select" id="status" name="status">
+                  <select class="select" id="status" name="status" <c:if test="${!canEdit}">disabled</c:if>>
                   <option value="Active" <c:if test="${rateForm.status == 'Active'}">selected</c:if>>Active</option>
                   <option value="Inactive" <c:if test="${rateForm.status == 'Inactive'}">selected</c:if>>Inactive</option>
                 </select>
               </div>
             </div>
-            <div class="header-actions">
-              <button class="btn" type="submit">Save Rate</button>
-              <a class="btn-link" href="${pageContext.request.contextPath}/rooms/rates">
-                <button class="btn btn-secondary" type="button">Clear Form</button>
-              </a>
-            </div>
+            <c:if test="${canEdit}">
+              <div class="header-actions">
+                <button class="btn" type="submit">Save Rate</button>
+                <a class="btn-link" href="${pageContext.request.contextPath}/rooms/rates">
+                  <button class="btn btn-secondary" type="button">Clear Form</button>
+                </a>
+              </div>
+            </c:if>
           </form>
         </div>
 
@@ -266,7 +268,9 @@
                 <th>Rate</th>
                 <th>Package</th>
                 <th>Status</th>
-                <th>Actions</th>
+                  <c:if test="${canEdit}">
+                    <th>Actions</th>
+                  </c:if>
               </tr>
             </thead>
             <tbody>
@@ -277,24 +281,33 @@
                   <td><c:out value="${rate.nightlyRate}" /></td>
                   <td><c:out value="${rate.packageName}" /></td>
                   <td><c:out value="${rate.status}" /></td>
-                  <td>
-                    <div class="inline-actions">
-                      <form class="inline-form" method="get" action="${pageContext.request.contextPath}/rooms/rates">
-                        <input type="hidden" name="editId" value="<c:out value='${rate.id}'/>" />
-                        <button class="btn btn-secondary" type="submit">Edit</button>
-                      </form>
-                      <form class="inline-form" method="post" action="${pageContext.request.contextPath}/rooms/rates/delete">
-                        <input type="hidden" name="id" value="<c:out value='${rate.id}'/>" />
-                        <button class="btn btn-danger" type="submit">Delete</button>
-                      </form>
-                    </div>
-                  </td>
+                    <c:if test="${canEdit}">
+                      <td>
+                        <div class="inline-actions">
+                          <form class="inline-form" method="get" action="${pageContext.request.contextPath}/rooms/rates">
+                            <input type="hidden" name="editId" value="<c:out value='${rate.id}'/>" />
+                            <button class="btn btn-secondary" type="submit">Edit</button>
+                          </form>
+                          <form class="inline-form" method="post" action="${pageContext.request.contextPath}/rooms/rates/delete">
+                            <input type="hidden" name="id" value="<c:out value='${rate.id}'/>" />
+                            <button class="btn btn-danger" type="submit">Delete</button>
+                          </form>
+                        </div>
+                      </td>
+                    </c:if>
                 </tr>
               </c:forEach>
               <c:if test="${empty rateList}">
-                <tr>
-                  <td colspan="6">No rates yet.</td>
-                </tr>
+                  <tr>
+                    <c:choose>
+                      <c:when test="${canEdit}">
+                        <td colspan="6">No rates yet.</td>
+                      </c:when>
+                      <c:otherwise>
+                        <td colspan="5">No rates yet.</td>
+                      </c:otherwise>
+                    </c:choose>
+                  </tr>
               </c:if>
             </tbody>
           </table>
