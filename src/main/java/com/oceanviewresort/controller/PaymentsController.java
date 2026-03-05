@@ -37,7 +37,7 @@ public class PaymentsController {
 
         HttpSession session = request.getSession(false);
         model.addAttribute("canEdit", AccessUtil.canEdit(session));
-        model.addAttribute("canPrint", true);
+        model.addAttribute("canPrint", AccessUtil.canEdit(session));
 
         Payment form = new Payment();
         if (editId != null) {

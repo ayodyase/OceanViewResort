@@ -229,10 +229,19 @@
       display: flex;
       gap: 8px;
       align-items: center;
+      flex-wrap: wrap;
     }
     .inline-actions .btn {
       padding: 6px 10px;
       font-size: 12px;
+    }
+    .inline-input {
+      width: 140px;
+      padding: 6px 8px;
+      font-size: 12px;
+      border-radius: 10px;
+      border: 1px solid #d9dee7;
+      background: #f9fbff;
     }
     .inline-form {
       display: inline-block;
@@ -298,13 +307,16 @@
           </c:if>
       </div>
 
-      <c:if test="${not empty errorMessage}">
-        <div class="alert"><c:out value="${errorMessage}" /></div>
-      </c:if>
 
       <div class="section-grid">
         <div class="panel">
           <h4>Staff Details</h4>
+          <c:if test="${not empty successMessage}">
+            <p class="helper" style="color:#0f7a4d;"><c:out value="${successMessage}" /></p>
+          </c:if>
+          <c:if test="${not empty errorMessage}">
+            <p class="helper" style="color:#bf3030;"><c:out value="${errorMessage}" /></p>
+          </c:if>
           <form method="post" action="${pageContext.request.contextPath}/users/save" autocomplete="off">
             <input type="hidden" name="id" value="<c:out value='${staffForm.id}'/>" />
             <div class="form-row">
@@ -432,6 +444,7 @@
                           </form>
                           <form class="inline-form" method="post" action="${pageContext.request.contextPath}/users/reset-password">
                             <input type="hidden" name="id" value="<c:out value='${staff.id}'/>" />
+                            <input class="inline-input" type="password" name="newPassword" placeholder="New password" />
                             <button class="btn btn-secondary" type="submit">Reset Password</button>
                           </form>
                         </div>

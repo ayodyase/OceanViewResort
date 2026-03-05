@@ -51,6 +51,13 @@ public class UsersController {
 
         model.addAttribute("staffForm", form);
         model.addAttribute("staffList", staffDao.findAll());
+        if (session != null) {
+            Object flash = session.getAttribute("flashMessage");
+            if (flash instanceof String) {
+                model.addAttribute("successMessage", flash);
+                session.removeAttribute("flashMessage");
+            }
+        }
         return "users";
     }
 
@@ -92,6 +99,7 @@ public class UsersController {
 
     @PostMapping("/reset-password")
     public String resetPassword(@RequestParam("id") int id,
+                                @RequestParam(value = "newPassword", required = false) String newPassword,
                                 HttpServletRequest request,
                                 HttpServletResponse response,
                                 Model model) throws IOException {
@@ -105,8 +113,17 @@ public class UsersController {
             model.addAttribute("errorMessage", "Unable to reset password for the selected staff member.");
             return "users";
         }
-        String newHash = PasswordUtil.hashPassword(staff.getEmployeeId());
+        String passwordValue = isBlank(newPassword) ? staff.getEmployeeId() : newPassword.trim();
+        String newHash = PasswordUtil.hashPassword(passwordValue);
         staffDao.updatePasswordHash(id, newHash);
+        HttpSession session = request.getSession(false);
+        if (session != null) {
+            if (isBlank(newPassword)) {
+                session.setAttribute("flashMessage", "Password reset to Employee ID for " + staff.getName() + ".");
+            } else {
+                session.setAttribute("flashMessage", "Password updated for " + staff.getName() + ".");
+            }
+        }
         return "redirect:/users";
     }
 
