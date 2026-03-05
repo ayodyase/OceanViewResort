@@ -8,6 +8,7 @@
   <meta name="viewport" content="width=device-width, initial-scale=1" />
   <title>Ocean View Resort - Admin</title>
   <link rel="icon" href="${pageContext.request.contextPath}/assets/logo.png" />
+  <link rel="stylesheet" href="${pageContext.request.contextPath}/assets/responsive.css" />
   <style>
     :root {
       --bg: #f4f6fb;
