@@ -277,19 +277,19 @@
     <h2>Overview</h2>
     <div class="stats">
       <div class="stat-card">
-        <h3>${availableRoomsCount}</h3>
+        <h3 class="js-counter" data-target="${availableRoomsCount}">0</h3>
         <span>Available Rooms</span>
       </div>
       <div class="stat-card">
-        <h3>${unavailableRoomsCount}</h3>
+        <h3 class="js-counter" data-target="${unavailableRoomsCount}">0</h3>
         <span>Unavailable Rooms</span>
       </div>
       <div class="stat-card">
-        <h3>${bookedRoomsCount}</h3>
+        <h3 class="js-counter" data-target="${bookedRoomsCount}">0</h3>
         <span>Booked Rooms</span>
       </div>
       <div class="stat-card">
-        <h3>${unbookedRoomsCount}</h3>
+        <h3 class="js-counter" data-target="${unbookedRoomsCount}">0</h3>
         <span>Unbooked Rooms</span>
       </div>
     </div>
@@ -340,5 +340,32 @@
       </a>
     </div>
   </main>
+  <script>
+    document.addEventListener("DOMContentLoaded", function () {
+      var counters = document.querySelectorAll(".js-counter");
+      counters.forEach(function (counter) {
+        var target = parseInt(counter.getAttribute("data-target"), 10);
+        if (!Number.isFinite(target) || target < 0) {
+          counter.textContent = "0";
+          return;
+        }
+
+        var durationMs = 700;
+        var stepMs = 16;
+        var steps = Math.max(1, Math.ceil(durationMs / stepMs));
+        var currentStep = 0;
+
+        var timer = setInterval(function () {
+          currentStep += 1;
+          var nextValue = Math.round((target * currentStep) / steps);
+          counter.textContent = String(nextValue);
+          if (currentStep >= steps) {
+            counter.textContent = String(target);
+            clearInterval(timer);
+          }
+        }, stepMs);
+      });
+    });
+  </script>
 </body>
 </html>

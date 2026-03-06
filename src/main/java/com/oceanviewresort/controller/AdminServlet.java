@@ -17,6 +17,11 @@ import java.util.ArrayList;
 import java.util.List;
 
 public class AdminServlet extends HttpServlet {
+    private static final String BOOKED_ROOMS_SUBQUERY =
+            "SELECT room_number FROM bookings WHERE status = 'Confirmed' " +
+            "UNION " +
+            "SELECT room_number FROM room_availability WHERE availability_status = 'Booked'";
+
     @Override
     protected void doGet(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
         HttpSession session = request.getSession(false);
@@ -31,27 +36,22 @@ public class AdminServlet extends HttpServlet {
         String dbPassword = getConfigValue(request, "DB_PASSWORD");
 
         request.setAttribute("availableRoomsCount", fetchCount(dbUrl, dbUser, dbPassword,
-                "SELECT COUNT(*) FROM rooms WHERE status = 'Available'"));
+                "SELECT COUNT(*) " +
+                "FROM rooms r " +
+                "WHERE r.status = 'Available' " +
+                "AND r.room_number NOT IN (" + BOOKED_ROOMS_SUBQUERY + ")"));
         request.setAttribute("bookedRoomsCount", fetchCount(dbUrl, dbUser, dbPassword,
-                "SELECT COUNT(DISTINCT room_number) FROM (" +
-                        "SELECT room_number FROM bookings WHERE status = 'Confirmed' " +
-                        "UNION " +
-                        "SELECT room_number FROM room_availability WHERE availability_status = 'Booked'" +
-                        ") AS booked_rooms"));
+                "SELECT COUNT(DISTINCT r.room_number) " +
+                "FROM rooms r " +
+                "JOIN (" + BOOKED_ROOMS_SUBQUERY + ") b ON b.room_number = r.room_number " +
+                "WHERE r.status <> 'Non-Available'"));
         request.setAttribute("unavailableRoomsCount", fetchCount(dbUrl, dbUser, dbPassword,
                 "SELECT COUNT(*) FROM rooms WHERE status = 'Non-Available'"));
         request.setAttribute("unbookedRoomsCount", fetchCount(dbUrl, dbUser, dbPassword,
-                "SELECT GREATEST((" +
-                        "SELECT COUNT(*) FROM rooms" +
-                        ") - (" +
-                        "SELECT COUNT(DISTINCT room_number) FROM (" +
-                        "SELECT room_number FROM bookings WHERE status = 'Confirmed' " +
-                        "UNION " +
-                        "SELECT room_number FROM room_availability WHERE availability_status = 'Booked'" +
-                        ") AS booked_rooms" +
-                        ") - (" +
-                        "SELECT COUNT(*) FROM rooms WHERE status = 'Non-Available'" +
-                        "), 0)"));
+                "SELECT COUNT(*) " +
+                "FROM rooms r " +
+                "WHERE r.status <> 'Non-Available' " +
+                "AND r.room_number NOT IN (" + BOOKED_ROOMS_SUBQUERY + ")"));
         request.setAttribute("reservationList", fetchReservations(dbUrl, dbUser, dbPassword));
 
         request.getRequestDispatcher("/admin.jsp").forward(request, response);
