@@ -340,32 +340,6 @@
       </a>
     </div>
   </main>
-  <script>
-    document.addEventListener("DOMContentLoaded", function () {
-      var counters = document.querySelectorAll(".js-counter");
-      counters.forEach(function (counter) {
-        var target = parseInt(counter.getAttribute("data-target"), 10);
-        if (!Number.isFinite(target) || target < 0) {
-          counter.textContent = "0";
-          return;
-        }
-
-        var durationMs = 700;
-        var stepMs = 16;
-        var steps = Math.max(1, Math.ceil(durationMs / stepMs));
-        var currentStep = 0;
-
-        var timer = setInterval(function () {
-          currentStep += 1;
-          var nextValue = Math.round((target * currentStep) / steps);
-          counter.textContent = String(nextValue);
-          if (currentStep >= steps) {
-            counter.textContent = String(target);
-            clearInterval(timer);
-          }
-        }, stepMs);
-      });
-    });
-  </script>
+  <script src="${pageContext.request.contextPath}/assets/admin-counters.js"></script>
 </body>
 </html>
